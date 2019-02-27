@@ -3,13 +3,12 @@ package com.appdynamics.crawler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Before;
 import org.junit.Test;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Scanner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -44,9 +43,11 @@ public class CrawlerTest {
         List<URI> uris = new ArrayList<>();
 
         try {
-            uris = Files.lines(Paths.get("urls.txt"))
-                    .map(URI::create)
-                    .collect(Collectors.toList());
+            Scanner scanner = new Scanner(new File("urls.txt"));
+            while (scanner.hasNext()){
+                String line = scanner.nextLine();
+                uris.add(URI.create(line));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
