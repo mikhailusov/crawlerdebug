@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class CrawlerTest {
@@ -20,8 +21,7 @@ public class CrawlerTest {
 
     @Before
     public void setUp() {
-        target = new Crawler();
-        target.setClient(HttpClientBuilder.create().build());
+        target = new Crawler(HttpClientBuilder.create().build());
         URIs = loadURIs();
     }
 
@@ -36,8 +36,8 @@ public class CrawlerTest {
     public void runSetsPageFieldsCorrectly() {
         Page page = target.run(URI.create("http://google.com")).get(0);
         assertTrue(page.getTitle().equals("Google"));
-        assertEquals(9, page.getLinks().size());
-        assertTrue(page.isHasGoogleAnalytics());
+        assertEquals(10, page.getLinks().size());
+        assertFalse(page.isHasGoogleAnalytics());
     }
 
     private List<URI> loadURIs() {
@@ -45,7 +45,13 @@ public class CrawlerTest {
 
         try {
             uris = Files.lines(Paths.get("urls.txt"))
-                    .map(URI::create)
+                    .filter(str -> !str.isEmpty())
+                    .map(str -> {
+                        if (!str.startsWith("http") && !str.startsWith("https")) {
+                            str = "http://" + str;
+                        }
+                        return URI.create(str);
+                    })
                     .collect(Collectors.toList());
         } catch (IOException e) {
             e.printStackTrace();

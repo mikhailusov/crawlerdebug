@@ -16,14 +16,12 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Crawler {
 
     private HttpClient client;
 
-    public void setClient(HttpClient client) {
+    public Crawler(HttpClient client) {
         this.client = client;
     }
 
@@ -33,7 +31,7 @@ public class Crawler {
             HttpResponse responseBody;
             try {
                 responseBody = client.execute(new HttpGet(uri));
-                pages.add(createPage(responseBody));
+                pages.add(new Page(EntityUtils.toString(responseBody.getEntity())));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -44,33 +42,4 @@ public class Crawler {
     public List<Page> run(URI uri) {
         return run(Arrays.asList(uri));
     }
-
-    private Page createPage(HttpResponse response) throws IOException {
-        Page page = new Page();
-        page.setBody(EntityUtils.toString(response.getEntity()));
-        setPageTitle(page);
-        setPageLinks(page);
-        setPageGoogleAnalytics(page);
-        return page;
-    }
-
-    private void setPageTitle(Page page) {
-        Pattern pattern = Pattern.compile("<title>(.+?)</title>", Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(page.getBody());
-        matcher.find();
-        page.setTitle(matcher.group(1));
-    }
-
-    private void setPageLinks(Page page) {
-        Pattern pattern = Pattern.compile("<a\\s+href=\"([^\"]+)\"[^>]*>(.+?)</a>", Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(page.getBody());
-        while (matcher.find()) {
-                page.getLinks().add(URI.create(matcher.group(1)));
-        }
-    }
-
-    private void setPageGoogleAnalytics(Page page) {
-        page.setHasGoogleAnalytics(page.getBody().contains(".google-analytics.com/ga.js"));
-    }
-
 }
