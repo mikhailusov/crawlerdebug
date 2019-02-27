@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class CrawlerTest {
@@ -33,10 +34,10 @@ public class CrawlerTest {
 
     @Test
     public void runSetsPageFieldsCorrectly() {
-        Page page = target.run(URI.create("http://google.com")).get(0);
-        assertTrue(page.getTitle().equals("Google"));
-        assertEquals(9, page.getLinks().size());
-        assertTrue(page.isHasGoogleAnalytics());
+        Page page = target.run(URI.create("https://www.w3.org/Provider/Style/URI")).get(0);
+        assertTrue(page.getTitle().equals("Hypertext Style: Cool URIs don't change."));
+        assertEquals(6, page.getLinks().size());
+        assertFalse(page.isHasGoogleAnalytics());
     }
 
     private List<URI> loadURIs() {
