@@ -29,14 +29,14 @@ public class Page {
 
     private void setTitle() {
         Pattern pattern = Pattern.compile("<title>(.+?)</title>", Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(this.body);
+        Matcher matcher = pattern.matcher(body);
         matcher.find();
-        this.title = matcher.group(1);
+        title = matcher.group(1);
     }
 
     private void setLinks() {
-        Pattern pattern = Pattern.compile("<a\\s+href=\"([^\"]+)\"[^>]*>(.+?)</a>", Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(this.body);
+        Pattern pattern = Pattern.compile("<a\\s+href=\"([^\"]+)\"[^>]*>", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(body);
         while (matcher.find()) {
             if (!matcher.group(1).startsWith("javascript")) {
                 this.links.add(URI.create(matcher.group(1)));

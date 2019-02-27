@@ -3,13 +3,12 @@ package com.appdynamics.crawler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Before;
 import org.junit.Test;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Scanner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -34,9 +33,9 @@ public class CrawlerTest {
 
     @Test
     public void runSetsPageFieldsCorrectly() {
-        Page page = target.run(URI.create("http://google.com")).get(0);
-        assertTrue(page.getTitle().equals("Google"));
-        assertEquals(10, page.getLinks().size());
+        Page page = target.run(URI.create("https://www.w3.org/Provider/Style/URI")).get(0);
+        assertTrue(page.getTitle().equals("Hypertext Style: Cool URIs don't change."));
+        assertEquals(6, page.getLinks().size());
         assertFalse(page.isHasGoogleAnalytics());
     }
 
@@ -44,15 +43,18 @@ public class CrawlerTest {
         List<URI> uris = new ArrayList<>();
 
         try {
-            uris = Files.lines(Paths.get("urls.txt"))
-                    .filter(str -> !str.isEmpty())
-                    .map(str -> {
-                        if (!str.startsWith("http") && !str.startsWith("https")) {
-                            str = "http://" + str;
-                        }
-                        return URI.create(str);
-                    })
-                    .collect(Collectors.toList());
+            Scanner scanner = new Scanner(new File("urls.txt"));
+            while (scanner.hasNext()){
+                String line = scanner.nextLine();
+                line = line.split("#")[0];
+                if (line.isEmpty()) {
+                    continue;
+                }
+                if (!line.startsWith("http") && !line.startsWith("https")) {
+                    line = "http://" + line;
+                }
+                uris.add(URI.create(line));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
